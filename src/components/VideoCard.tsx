@@ -22,6 +22,7 @@ export default function VideoCard({ item }: { item: YTSearchItem }) {
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.98)).current;
   const showTimer = useRef<number | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const onHoverIn = () => {
     if (Platform.OS !== 'web') return;
@@ -41,6 +42,8 @@ export default function VideoCard({ item }: { item: YTSearchItem }) {
       scale.setValue(0.98);
     });
   };
+
+  const embedUrl = `https://www.youtube.com/embed/${item.id.videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&fs=0&iv_load_policy=3`;
 
   return (
     <View style={styles.card}>
@@ -63,7 +66,16 @@ export default function VideoCard({ item }: { item: YTSearchItem }) {
 
         {hover && Platform.OS === 'web' && (
           <Animated.View style={[styles.preview, { opacity, transform: [{ scale }] }]}>
-            <Image source={{ uri: thumb }} style={styles.previewImg} resizeMode="cover" />
+            <iframe
+              ref={iframeRef}
+              src={embedUrl}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+              }}
+              allow="autoplay; encrypted-media"
+            />
           </Animated.View>
         )}
       </Pressable>
@@ -84,9 +96,9 @@ const styles = StyleSheet.create({
   subtle: { fontSize: 12, color: '#666' },
   preview: {
     position: 'absolute',
-    top: 6,
-    left: 6,
-    width: '92%',
+    top: 0,
+    left: 0,
+    width: '100%',
     aspectRatio: 16 / 9,
     borderRadius: 10,
     backgroundColor: '#000',
